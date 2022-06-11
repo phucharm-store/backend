@@ -1,8 +1,8 @@
-from django.shortcuts import render
+from .session import Session
 
 # Create your views here.
-class ReverseAngular:
+class ReverseAngular(Session):
     def loader(self, request):
-        return render(request, 'index.html', {
+        return self._loader(request, {
             'title': 'PhuCharm Tester: Render Template'
         })
