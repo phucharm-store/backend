@@ -12,6 +12,20 @@ class Session:
         print(self.setJWT(random_str(22)))
         return render(request, 'index.html', context)
 
+    def getJWT(self, tk: str):
+        def decode(options: dict = None):
+            return jwt.decode(tk, self.__SECRET_KEY, ['HS256'], options)
+
+        try:
+            pl = decode()
+            return 200, pl
+        except jwt.exceptions.ExpiredSignatureError:
+            pl = decode({ 'verify_signature': False })
+            return 410, pl
+        except jwt.exceptions.InvalidSignatureError:
+            pl = decode({ 'verify_signature': False })
+            return 400, None
+
     def setJWT(self, entity: str, user_token: str = '', id: int = 1, key: bytes = __SECRET_KEY.encode()):
         t = math.floor(datetime.now().timestamp())
         pl = {
