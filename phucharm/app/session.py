@@ -2,6 +2,7 @@ from datetime import datetime
 from django.shortcuts import render
 from libs.format import hash_secret
 from libs.random import random_str
+from .cookie import setCookie
 import jwt, uuid, math
 
 # Create and Manage your JWT Session here.
@@ -9,8 +10,18 @@ class Session:
     __SECRET_KEY = 'secret'
 
     def _loader(self, request, context):
-        print(self.setJWT(random_str(22)))
-        return render(request, 'index.html', context)
+        if 'SSKY' in request.COOKIES and 'SSID' in request.COOKIES:
+            response = render(request, 'index.html', context)
+            return response
+
+        response = render(request, 'index.html', context)
+        ett = random_str(22)
+        pl, tk, pk = self.setJWT(ett)
+
+        setCookie(response, 'SSKY', pk)
+        setCookie(response, 'SSID', tk)
+
+        return response
 
     def getJWT(self, tk: str):
         def decode(options: dict = None):
