@@ -11,8 +11,22 @@ class Session:
 
     def _loader(self, request, context):
         if 'SSKY' in request.COOKIES and 'SSID' in request.COOKIES:
-            response = render(request, 'index.html', context)
-            return response
+            status, pl = self.getJWT(request.COOKIES['SSID'])
+
+            if status == 200:
+                # session is ok.
+                response = render(request, 'index.html', context)
+                return response
+
+            if status == 410:
+                # session was expired!
+                response = render(request, 'index.html', context)
+                return response
+
+            if status == 400:
+                # session was invalid!
+                response = render(request, '400.html', { 'issue': 'InvalidJWTSignature' })
+                return response
 
         response = render(request, 'index.html', context)
         ett = random_str(22)
